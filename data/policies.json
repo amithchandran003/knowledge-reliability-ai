@@ -1,0 +1,23 @@
+[
+  {
+    "title": "Data Privacy Policy",
+    "source": "Internal Compliance",
+    "version": "1.2",
+    "updated_date": "2025-01-15",
+    "content": "All personal data must be encrypted at rest and in transit."
+  },
+  {
+    "title": "Acceptable Use Policy",
+    "source": "IT Security",
+    "version": "2.0",
+    "updated_date": "2025-03-10",
+    "content": "Company hardware and networks are intended strictly for business purposes."
+  },
+  {
+    "title": "Information Security Policy",
+    "source": "Cybersecurity Team",
+    "version": "3.1",
+    "updated_date": "2025-05-22",
+    "content": "Multi-factor authentication (MFA) is mandatory for accessing production environments."
+  }
+]

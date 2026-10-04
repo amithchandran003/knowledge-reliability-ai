@@ -1,0 +1,29 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Development backups
+*.backup
+*.before_multiclaim
+
+# Local runtime/test artifacts
+*.log
+
+# Runtime data
+/data/answers/
+/data/embedding_cache/
+/data/snapshots_v2/
+/data/notifications/

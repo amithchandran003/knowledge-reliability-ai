@@ -27,3 +27,5 @@ Thumbs.db
 /data/embedding_cache/
 /data/snapshots_v2/
 /data/notifications/
+
+/data/snapshots/

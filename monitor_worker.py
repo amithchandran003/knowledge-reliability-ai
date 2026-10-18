@@ -1,6 +1,9 @@
 """Orchestrates one monitoring cycle across enabled sources."""
 
+import json
+
 from answer_memory import load_answers
+from monitor_store import save_monitoring_run
 from source_registry import load_sources
 from v2_monitor_pipeline import run_v2_monitor
 
@@ -47,12 +50,13 @@ def run_monitoring_cycle() -> list[dict]:
                 }
             )
 
+    # Persist the completed monitoring cycle.
+    save_monitoring_run(results)
+
     return results
 
 
 if __name__ == "__main__":
-    import json
-
     results = run_monitoring_cycle()
 
     print(

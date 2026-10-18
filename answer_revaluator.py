@@ -9,6 +9,7 @@ or whether specific factual claims have become outdated or contradicted.
 
 import json
 import os
+import time
 import requests
 
 
@@ -111,18 +112,72 @@ Return a JSON object with these EXACT keys:
         }
     }
 
-    try:
-        response = requests.post(
-            api_url,
-            headers=headers,
-            json=payload,
-            timeout=GEMINI_REQUEST_TIMEOUT_SECONDS,
-        )
-    except requests.RequestException as err:
-        raise RuntimeError("Gemini re-evaluation request failed due to a network or service error.") from err
+        # Retry temporary Gemini/API failures.
+    # 429 = rate limit
+    # 500/502/503/504 = temporary server/service failures
+    retryable_status_codes = {429, 500, 502, 503, 504}
 
-    if response.status_code != 200:
-        raise RuntimeError(f"Gemini re-evaluation request failed (HTTP {response.status_code}).")
+    max_attempts = 4
+    response = None
+
+    for attempt in range(1, max_attempts + 1):
+
+        try:
+            response = requests.post(
+                api_url,
+                headers=headers,
+                json=payload,
+                timeout=GEMINI_REQUEST_TIMEOUT_SECONDS,
+            )
+
+        except requests.RequestException as err:
+
+            if attempt == max_attempts:
+                raise RuntimeError(
+                    "Gemini re-evaluation request failed after "
+                    f"{max_attempts} attempts due to a network error."
+                ) from err
+
+            wait_seconds = 2 ** (attempt - 1)
+
+            print(
+                f"Gemini request failed on attempt {attempt}. "
+                f"Retrying in {wait_seconds} seconds..."
+            )
+
+            time.sleep(wait_seconds)
+            continue
+
+        # Successful response
+        if response.status_code == 200:
+            break
+
+        # Temporary failure — retry
+        if response.status_code in retryable_status_codes:
+
+            if attempt == max_attempts:
+                raise RuntimeError(
+                    "Gemini re-evaluation request failed after "
+                    f"{max_attempts} attempts "
+                    f"(HTTP {response.status_code})."
+                )
+
+            wait_seconds = 2 ** (attempt - 1)
+
+            print(
+                f"Gemini returned HTTP {response.status_code} "
+                f"on attempt {attempt}. "
+                f"Retrying in {wait_seconds} seconds..."
+            )
+
+            time.sleep(wait_seconds)
+            continue
+
+        # Permanent/unexpected HTTP error
+        raise RuntimeError(
+            f"Gemini re-evaluation request failed "
+            f"(HTTP {response.status_code})."
+        )
 
     data = response.json()
     try:

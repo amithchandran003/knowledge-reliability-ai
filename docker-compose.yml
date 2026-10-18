@@ -1,0 +1,26 @@
+services:
+  app:
+    build: .
+    container_name: knowledge-reliability-app
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+    command: >
+      streamlit run app.py
+      --server.address=0.0.0.0
+      --server.port=8501
+
+  scheduler:
+    build: .
+    container_name: knowledge-reliability-scheduler
+    env_file:
+      - .env
+    environment:
+      MONITOR_INTERVAL_MINUTES: "60"
+    volumes:
+      - ./data:/app/data
+    command: python scheduler.py
+    
